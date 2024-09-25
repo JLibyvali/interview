@@ -6,24 +6,26 @@
 #include <type_traits>
 #include <utility>
 #ifdef LIST1
-#include "DoublyList.h"
+#    include "DoublyList.h"
 #endif
 
 #ifdef LIST2
-#include "SingalList.h"
+#    include "SingalList.h"
 #endif
+
+#include "Queue.h"
+#include "Stack.h"
+#include "Tree.h"
 
 #include <cmath>
 #include <random>
 #include <vector>
-#include "Stack.h"
-#include "Queue.h"
-#include "Tree.h"
 
 using namespace std;
 
 #ifdef LIST1
-void DoublyListPrac(void) {
+void DoublyListPrac(void)
+{
 
     /**
      * @brief Random num generate
@@ -31,22 +33,25 @@ void DoublyListPrac(void) {
        2. select distribution, and num type
        3. using the distribution and engine
      */
-    vector<int> randNUM(1000, 0);
-    random_device rd;
-    mt19937_64 gen64(rd());
+    vector<int>                   randNUM(1000, 0);
+    random_device                 rd;
+    mt19937_64                    gen64(rd());
 
     // using linera distribution random
     uniform_int_distribution<int> distriList(1, 1333);
 
-    for (auto &ele : randNUM) {
+    for (auto &ele : randNUM)
+    {
         ele = distriList(gen64);
     }
 
     DoubleList dlist;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         dlist.insert(randNUM[i], 0);
     }
-    for (int i = 3; i < 7; i++) {
+    for (int i = 3; i < 7; i++)
+    {
         dlist.insert(randNUM[i], 1);
     }
 
@@ -71,23 +76,26 @@ void DoublyListPrac(void) {
 #endif
 
 #ifdef LIST2
-void SingalListPrac(void) {
+void SingalListPrac(void)
+{
 
-    vector<double> randomNUM(1000, 0.0);
-    random_device rd;
-    mt19937_64 gen64(rd());
+    vector<double>              randomNUM(1000, 0.0);
+    random_device               rd;
+    mt19937_64                  gen64(rd());
 
     // using normal distribution
-    double mean   = 10;
-    double stddev = 2.45;
+    double                      mean   = 10;
+    double                      stddev = 2.45;
     normal_distribution<double> ndistr(mean, stddev);
 
     for (auto &ele : randomNUM)
         ele = ndistr(gen64);
 
     SList sl;
-    try {
-        for (int i = 0; i < 3; i++) {
+    try
+    {
+        for (int i = 0; i < 3; i++)
+        {
             sl.insert(0, randomNUM[i]);
             sl.insert(1, randomNUM[i + 1]);
         }
@@ -98,7 +106,9 @@ void SingalListPrac(void) {
         sl.print();
 
         printf("Get Node : %.6f \n", sl.get_node(randomNUM[0]).id);
-        printf("Change node : from %.6f  to %.6f \n", sl.get_node(randomNUM[2]).id, sl.chang_node(randomNUM[2], 99999.9).id);
+        printf(
+            "Change node : from %.6f  to %.6f \n", sl.get_node(randomNUM[2]).id, sl.chang_node(randomNUM[2], 99999.9).id
+        );
 
         printf("Delete node : %.6f\n", sl.del(randomNUM[1]).id);
         sl.print();
@@ -106,21 +116,25 @@ void SingalListPrac(void) {
         printf("Clear List: \n ");
         sl.clear();
         sl.print();
-    } catch (const exception &ex) {
+    }
+    catch (const exception &ex)
+    {
         printf("Exception occurred: %s, exit\n", ex.what());
     }
 }
 
-void PracStack(void) {
+void PracStack(void)
+{
 
-    std::vector<stk::SElem> vec(100, {0, '0'});
+    std::vector<stk::SElem>            vec(100, {0, '0'});
 
-    std::random_device rd;
-    std::mt19937_64 gen64;
+    std::random_device                 rd;
+    std::mt19937_64                    gen64;
 
     std::uniform_int_distribution<int> dist(65, 90);
 
-    for (auto &ele : vec) {
+    for (auto &ele : vec)
+    {
 
         int num = dist(gen64);
         ele.id  = num;
@@ -128,7 +142,8 @@ void PracStack(void) {
     }
 
     stk::StackLinear stack1;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         stack1.push(vec[i]);
     }
 
@@ -142,7 +157,8 @@ void PracStack(void) {
     stack1.printStk();
 
     stk::StackLinear stack2;
-    for (int i = 10; i < 14; i++) {
+    for (int i = 10; i < 14; i++)
+    {
         stack2.push(vec[i]);
     }
 
@@ -151,35 +167,37 @@ void PracStack(void) {
     stackB.printStkB();
 }
 
-void Pracque(void) {
+void Pracque(void)
+{
 
-    std::random_device rd;
-    std::mt19937 gen;
+    std::random_device                 rd;
+    std::mt19937                       gen;
 
     std::uniform_int_distribution<int> dist(1, 120);
 
-    std::vector<que::qnode> vec(20, {que::qnode()});
+    std::vector<que::qnode>            vec(20, {que::qnode()});
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; i++)
+    {
         vec[i].id = dist(gen);
         vec[i].c  = 'T';
     }
 
     que::Queue_circle quecircl;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         quecircl.push(vec[i]);
     }
 
     quecircl.print();
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         quecircl.push(vec[i]);
     }
 
     quecircl.print();
 }
-
-
 
 // void func(tre::tnode &next) {
 

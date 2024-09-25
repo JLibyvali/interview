@@ -1,17 +1,44 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.28)
 project(DataStructure)
 
+enable_language(C CXX)
+
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(${CMAKE_CURRENT_LIST_DIR}/${LISTDIR}
-                    ${CMAKE_CURRENT_LIST_DIR}/${QandSDIR}
-                    ${CMAKE_CURRENT_LIST_DIR}/${TREEDIR})
+# Global compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -I/usr/lib/clang/18/include")
 
-file(GLOB QSSRC "${CMAKE_CURRENT_LIST_DIR}/${QandSDIR}/*.cpp")
-file(GLOB LSRC "${CMAKE_SOURCE_DIR}/${LISTDIR}/*.cpp")
-file(GLOB TSRC "${CMAKE_CURRENT_LIST_DIR}/${TREEDIR}/*.cpp")
 
-# DoublyList or SingalList
-add_compile_definitions(LIST2)
+include_directories(
+    .
+    LinkedList
+    QandS
+    Sort
+    Tree
+)
 
-add_executable(${CMAKE_PROJECT_NAME} main.cpp)
+set(LinkedList_SRC 
+LinkedList/singleList.cpp
+LinkedList/singleList_impl.cpp
+LinkedList/doublyList.cpp
+LinkedList/user.cpp
+
+)
+
+set(QandS_SRC
+QandS/queue.cpp
+QansS/stack.cpp 
+)
+
+set(Sort_SRC
+Sort/Sort.cpp)
+
+set(Tree_SRC
+Tree.cpp)
+
+
+add_executable(LinkedList ${LinkedList_SRC})
+# add_executable(QandS ${QandS_SRC})
+# add_executable(Sort ${Sort_SRC})
+# add_executable(Tree ${Tree_SRC})
