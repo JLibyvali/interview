@@ -2,171 +2,155 @@
 
 #include "singleList.h"
 
-#include <cstddef>
+#include <cctype>
 #include <iomanip>
 #include <iostream>
 #include <memory>
 #include <sstream>
 
-using namespace sList;
+using namespace slist;
 
-std::uint32_t SList_impl::getLen(const SList &list) const
+// constructor
+
+int SList_impl::getLen(const SList &m_list) const
 {
-    std::uint32_t res = 0;
+    int  res       = 1;
+    auto head_node = m_list.m_head.get();
 
-    if (*(list.m_head) == *(list.m_tail))
-        return 1;
-
-    auto tmp = list.m_head;
-
-    while (tmp)
+    while (head_node)
     {
         res++;
-        tmp = tmp->m_next;
+        head_node = head_node->m_next;
     }
 
     return res;
 }
 
-bool SList_impl::insert(SList &list, std::uint32_t _pos, const node &_node)
+bool SList_impl::insert(SList &m_list, int _pos, node &_node)
 {
-    bool res      = false;
-    auto tmp_node = std::make_shared<node>(_node);
+    bool res = false;
 
-    switch (_pos)
+    if (_pos == 1)
     {
-        case 1:
-            {
+        _node.m_next = m_list.m_head.release();
+        m_list.m_head.reset(&_node);
 
-                tmp_node->m_next = list.m_head;
-                list.m_head      = tmp_node;
-                res              = true;
-                break;
-            }
-        case 0:
-            {
-                list.m_tail->m_next = tmp_node;
-                tmp_node->m_next    = nullptr;
-                list.m_tail         = tmp_node;
-                res                 = true;
-                break;
-            }
-        default:
-            {
-                std::uint32_t index = 1;
-                auto          tmp   = list.m_head;
+        return true;
+    }
 
-                if (_pos == getLen(list))
-                {
-                    list.m_tail->m_next = tmp_node;
-                    tmp_node->m_next    = nullptr;
-                    list.m_tail         = tmp_node;
-                    break;
-                }
-
-                for (; tmp != nullptr; tmp = tmp->m_next, index++)
-                {
-                    if (index == (_pos - 1))
-                    {
-                        tmp_node->m_next = tmp->m_next;
-                        tmp              = tmp_node;
-                        res              = true;
-                        break;
-                    }
-                }
+    if (_pos > 1 && _pos <= getLen(m_list))
+    {
+        int   idx  = 1;
+        node *prev = nullptr, *cur = m_list.m_head.get();
+        while (cur)
+        {
+            if (idx == _pos)
+            {
+                prev->m_next = &_node;
+                _node.m_next = cur;
+                return true;
             }
+            idx++;
+
+            prev = cur;
+            cur  = cur->m_next;
+        }
     }
 
     return res;
 }
 
-void SList_impl::print(const SList &list) const
+void SList_impl::print(const SList &m_list) const
 {
     auto ss{std::stringstream()};
+
     ss << "######### Output List: \n";
+    auto temp_node = m_list.m_head.get();
+    auto now       = 0;
 
-    auto tmp = list.m_head;
-    auto now = 1;
-
-    while (tmp)
+    while (temp_node)
     {
-        ss << std::setw(4) << "{id" << tmp->m_id << " |idx" << now << " |addr" << tmp << "}->";
+        ss << std::setw(4) << "{id" << temp_node->m_id << " |List Index: " << now << " |addr" << temp_node << "}->";
         if (!(now % 4))
         {
             ss << "\n";
         }
 
-        tmp = tmp->m_next;
+        temp_node = temp_node->m_next;
         now++;
     }
 
     std::cout << ss.str() << std::endl;
 }
 
-node SList_impl::del(SList &_list, std::uint32_t _pos)
+slist::node SList_impl::del(const SList &m_list, int _pos)
 {
-    auto res{std::make_shared<node>(-1)};
-    if (*(_list.m_head) == *(_list.m_tail) && _pos == 1)
-    {
-        res = _list.m_head;
-        clean(_list);
-    }
-    auto len = getLen(_list);
-    switch (_pos)
-    {
-        case 1:
-            {
-                auto tmp             = _list.m_head->m_next;
-                _list.m_head->m_next = nullptr;
-                _list.m_head         = tmp;
-            }
-        default:
-            {
-                if (_pos < len)
-                {
-                    int  cur   = 0;
-                    auto tmp_p = _list.m_head;
-                    while (tmp_p)
-                    {
-                        cur++;
-                        if (cur == _pos - 1)
-                        {
-                            res                   = tmp_p->m_next->m_next;
-                            tmp_p->m_next->m_next = nullptr;
-                            tmp_p->m_next         = res;
-                            break;
-                        }
-                        tmp_p = tmp_p->m_next;
-                    }
-                }
-                else
-                {
-                    throw myException(err::BadOptions);
-                }
-            }
-    }
+    slist::node res{-1};
+    int         len = getLen(m_list);
 
-    return *res;
+    if (_pos < 1 && _pos > len)
+        return res;
+
+    node *cur = m_list.m_head.get(), *prev = nullptr;
+    int   idx = 1;
+
+    // Simple delete node
+    if (_pos == 1)
+    {
+        res = *cur;
+        cur = cur->m_next;
+        return res;
+    }
+    else if (_pos == len)
+    {
+        while (cur)
+        {
+            prev = cur;
+            cur  = cur->m_next;
+        }
+
+        res = *prev;
+        return res;
+    }
+    else
+    {
+        while (cur)
+        {
+
+            if (_pos == idx)
+            {
+                prev->m_next = cur->m_next;
+                cur->m_next  = nullptr;
+            }
+
+            idx++;
+            prev = cur;
+            cur  = cur->m_next;
+        }
+
+        res = *cur;
+        return res;
+    }
 }
 
-void SList_impl::clean(SList &_slist)
+bool SList_impl::reverse(SList &m_list) const
 {
-    if (*(_slist.m_head) == *(_slist.m_tail))
-    {
-        _slist.m_tail = nullptr;
-        _slist.m_head = nullptr;
-    }
+    int   res = false;
+    node *cur = m_list.m_head.get(), *prev = nullptr, *next = cur->m_next;
 
-    auto                  len  = getLen(_slist);
-    auto                  tmp  = _slist.m_head;
-    std::shared_ptr<node> next = nullptr;
-    while (tmp)
+    while (cur)
     {
-        next        = tmp->m_next;
-        tmp->m_next = nullptr;
-        tmp         = next;
-    }
+        // reverse from begin
+        cur->m_next = prev;
 
-    _slist.m_head = nullptr;
-    _slist.m_tail = nullptr;
+        // movement
+        prev        = cur;
+        cur         = next;
+        if (next != nullptr)
+            next = next->m_next;
+    }
+    m_list.m_head.release();
+    m_list.m_head.reset(prev);
+
+    return res;
 }

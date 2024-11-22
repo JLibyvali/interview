@@ -2,16 +2,41 @@
 
 #include "singleList_impl.h"
 
+#include <iostream>
 #include <memory>
+#include <utility>
 
-using namespace sList;
+using namespace slist;
 
-SList::SList(int _val) : Pimpl(std::make_shared<SList_impl>()), m_head(std::make_shared<node>(_val)), m_tail(m_head) {}
+// Constructor
+SList::SList(int _val) : m_head(new node(_val)) { m_Pimplptr.reset(new SList_impl()); }
 
-std::uint32_t SList::getLen() const { return Pimpl->getLen(*this); }
+// Move sematics
+void SList::moveFrom(SList &_another) noexcept
+{
+    // unique pointer use std::move
+    std::swap(this->m_head, _another.m_head);
+    std::swap(this->m_Pimplptr, this->m_Pimplptr);
+}
 
-bool          SList::insert(std::uint32_t _pos, const node &_node) { return Pimpl->insert(*this, _pos, _node); }
+SList::SList(SList &&_src) noexcept
+{
+    std::cout << "Move Sematics" << std::endl;
+    this->moveFrom(_src);
+}
 
-void          SList::print() const { return Pimpl->print(*this); }
+SList &SList::operator=(SList &&_rhs) noexcept
+{
+    this->moveFrom(_rhs);
+    return *this;
+}
 
-node          SList::del(std::uint32_t _pos) { return Pimpl->del(*this,_pos); }
+int  SList::getLen() const { return m_Pimplptr->getLen(*this); }
+
+bool SList::insert(int _pos, node &_node) { return m_Pimplptr->insert(*this, _pos, _node); }
+
+void SList::print() const { return m_Pimplptr->print(*this); }
+
+node SList::del(int _pos) { return m_Pimplptr->del(*this, _pos); }
+
+bool SList::reverse() { return m_Pimplptr->reverse(*this); }
