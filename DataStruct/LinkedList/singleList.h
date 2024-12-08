@@ -3,6 +3,7 @@
 
 #include <compare>
 #include <exception>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -74,10 +75,15 @@ struct node
     }
 
     // Move sematics
-    node(node &&_src) noexcept { this->moveFrom(_src); }
+    node(node &&_src) noexcept
+    {
+        std::cout << "######## Move ###########" << std::endl;
+        this->moveFrom(_src);
+    }
 
     node &operator=(node &&_lhs) noexcept
     {
+
         this->moveFrom(_lhs);
         return *this;
     }

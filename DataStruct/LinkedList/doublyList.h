@@ -16,7 +16,11 @@ struct node
 
     node(int _id) : m_id(_id), m_next(nullptr), m_prev(nullptr) {}
 
-    ~node()                = default;
+    ~node()
+    {
+        delete m_next;
+        m_next = nullptr;
+    }
 
     // Copy sematics
     node(const node &_src) = default;
@@ -57,9 +61,20 @@ public:
 
     DoubleList() : DoubleList(0) {}
 
-    DoubleList(int _id) : m_head(std::make_shared<node>(_id)), m_tail(m_head) {}
+    DoubleList(int _id) : m_head(std::make_unique<node>(_id)), m_tail(nullptr) {}
 
     ~DoubleList() = default;
+
+    // Move sematics
+    DoubleList(DoubleList &&_src) { this->moveFrom(_src); }
+
+    DoubleList &operator=(DoubleList &&_lhs)
+    {
+
+        this->moveFrom(_lhs);
+
+        return *this;
+    }
 
     /**
      * @brief Inset node at position with given _id
@@ -68,7 +83,7 @@ public:
      * @param pos
      * @return bool  insert success or not.
      */
-    bool cinsert(int _id, int pos);
+    bool insert(node &_node, int pos);
 
     /**
      * @brief Reverse Doubly linked list
@@ -80,18 +95,15 @@ public:
     /**
      * @brief Delete give id node, if fail throw exception.
      *
-     * @param _id
-     * @return node
+     * @param  postion
+     * @return bool
      */
-    node del(int _id);
+    bool del(int _pos);
 
     /**
      * @brief Print all linked list nodes.
      */
     void print() const;
-    int  clearList() const;
-    node change_node(int _id, int _new);
-    node get_node(int _id);
     int  getLen() const;
 
 private:
@@ -102,10 +114,14 @@ private:
     void        moveFrom(DoubleList &_another) noexcept
     {
         this->m_head.swap(_another.m_head);
-        this->m_tail.swap(_another.m_tail);
+        // Release original pointer value.
+        _another.m_head.release();
+
+        this->m_tail = std::exchange(_another.m_tail, nullptr);
     }
 
-    std::shared_ptr<node> m_head, m_tail;
+    std::unique_ptr<node> m_head;
+    node                 *m_tail;
 };
 
 }  // namespace dlist
